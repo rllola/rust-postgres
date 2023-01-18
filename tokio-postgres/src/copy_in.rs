@@ -93,23 +93,31 @@ where
         loop {
             match self.state {
                 SinkState::Active => {
+                    println!("state active");
                     ready!(self.as_mut().poll_flush(cx))?;
+                    println!("called flush");
                     let mut this = self.as_mut().project();
                     ready!(this.sender.as_mut().poll_ready(cx)).map_err(|_| Error::closed())?;
+                    println!("poll ready");
                     this.sender
                         .start_send(CopyInMessage::Done)
                         .map_err(|_| Error::closed())?;
+                    println!("start send");
                     *this.state = SinkState::Closing;
                 }
                 SinkState::Closing => {
+                    println!("state closing");
                     let this = self.as_mut().project();
                     ready!(this.sender.poll_close(cx)).map_err(|_| Error::closed())?;
+                    println!("called poll_close");
                     *this.state = SinkState::Reading;
                 }
                 SinkState::Reading => {
+                    println!("state reading");
                     let this = self.as_mut().project();
                     match ready!(this.responses.poll_next(cx))? {
                         Message::CommandComplete(body) => {
+                            println!("command complete");
                             let rows = body
                                 .tag()
                                 .map_err(Error::parse)?
