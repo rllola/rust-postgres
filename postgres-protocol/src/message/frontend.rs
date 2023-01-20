@@ -156,6 +156,8 @@ where
     pub fn write(self, out: &mut BytesMut) {
         out.put_u8(b'd');
         out.put_i32(self.len);
+        println!("write CopyData message");
+        dbg!(&out);
         out.put(self.buf);
     }
 }
