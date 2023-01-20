@@ -157,7 +157,7 @@ where
         out.put_u8(b'd');
         out.put_i32(self.len);
         println!("write CopyData message");
-        dbg!(&out);
+        dbg!(self.len);
         out.put(self.buf);
     }
 }
